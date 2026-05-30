@@ -1,0 +1,96 @@
+import { useState } from 'react';
+import { supabase } from '../../lib/supabase';
+
+export default function RegisterForm() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      await supabase
+        .from('profiles')
+        .update({ username })
+        .eq('id', data.user.id);
+    }
+
+    window.location.href = '/catalog';
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-slate-900 rounded-xl p-8 border border-slate-800">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg p-3 mb-5 text-sm">
+          {error}
+        </div>
+      )}
+
+      <div className="mb-4">
+        <label className="block text-slate-300 text-sm font-medium mb-1.5">Nombre de usuario</label>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+          placeholder="cinefilo123"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-slate-300 text-sm font-medium mb-1.5">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+          placeholder="tu@email.com"
+        />
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-slate-300 text-sm font-medium mb-1.5">Contraseña</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+          className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+          placeholder="••••••••"
+        />
+        <p className="text-slate-500 text-xs mt-1">Mínimo 6 caracteres</p>
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold py-3 rounded-lg transition-colors"
+      >
+        {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+      </button>
+
+      <p className="text-center text-slate-400 mt-5 text-sm">
+        ¿Ya tenés cuenta?{' '}
+        <a href="/login" className="text-amber-500 hover:text-amber-400 font-medium">
+          Iniciá sesión
+        </a>
+      </p>
+    </form>
+  );
+}

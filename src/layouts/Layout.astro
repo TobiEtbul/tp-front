@@ -1,0 +1,21 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="CineLog - Tu catálogo personal de películas y series" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} | CineLog</title>
+  </head>
+  <body class="bg-slate-950 text-white min-h-screen">
+    <slot />
+  </body>
+</html>

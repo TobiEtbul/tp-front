@@ -6,6 +6,7 @@ import MovieForm from './MovieForm';
 
 type FilterType = 'all' | 'movie' | 'series';
 type FilterStatus = 'all' | 'watching' | 'completed' | 'wishlist' | 'dropped';
+type SortBy = 'newest' | 'oldest' | 'title' | 'rating';
 
 const STATUS_FILTERS: [FilterStatus, string][] = [
   ['all', 'Todos'],
@@ -24,6 +25,7 @@ export default function CatalogApp() {
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<SortBy>('newest');
   const [username, setUsername] = useState('');
 
   useEffect(() => {
@@ -98,12 +100,25 @@ export default function CatalogApp() {
     window.location.href = '/';
   };
 
-  const filtered = entries.filter((e) => {
-    if (filterType !== 'all' && e.type !== filterType) return false;
-    if (filterStatus !== 'all' && e.status !== filterStatus) return false;
-    if (search && !e.title.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+  const filtered = entries
+    .filter((e) => {
+      if (filterType !== 'all' && e.type !== filterType) return false;
+      if (filterStatus !== 'all' && e.status !== filterStatus) return false;
+      if (search && !e.title.toLowerCase().includes(search.toLowerCase())) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'title':
+          return a.title.localeCompare(b.title, 'es');
+        case 'rating':
+          return (b.rating ?? 0) - (a.rating ?? 0);
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
 
   const stats = {
     total: entries.length,
@@ -195,6 +210,17 @@ export default function CatalogApp() {
             onChange={(e) => setSearch(e.target.value)}
             className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors min-w-[180px]"
           />
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortBy)}
+            className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-amber-500 transition-colors"
+          >
+            <option value="newest">Más recientes</option>
+            <option value="oldest">Más antiguos</option>
+            <option value="title">A → Z</option>
+            <option value="rating">Mejor puntuación</option>
+          </select>
 
           <div className="flex gap-1.5 bg-slate-800 rounded-lg p-1">
             {(['all', 'movie', 'series'] as FilterType[]).map((t) => (

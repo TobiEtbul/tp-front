@@ -22,4 +22,4 @@ Tu catálogo personal de películas y series.
 - Estadísticas del catálogo (totales por tipo y estado)
 - Edición de perfil (nombre de usuario)
 
-La app corre en `http://localhost:4321`
+https://tp-front-jet.vercel.app/

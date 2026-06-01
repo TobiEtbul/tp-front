@@ -3,11 +3,11 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "dev": "node ./node_modules/astro/dist/cli/index.js dev",
-    "start": "node ./node_modules/astro/dist/cli/index.js dev",
-    "build": "node ./node_modules/astro/dist/cli/index.js build",
-    "preview": "node ./node_modules/astro/dist/cli/index.js preview",
-    "astro": "node ./node_modules/astro/dist/cli/index.js"
+    "dev": "node ./node_modules/astro/astro.js dev",
+    "start": "node ./node_modules/astro/astro.js dev",
+    "build": "node ./node_modules/astro/astro.js build",
+    "preview": "node ./node_modules/astro/astro.js preview",
+    "astro": "node ./node_modules/astro/astro.js"
   },
   "dependencies": {
     "@astrojs/react": "^3.6.0",

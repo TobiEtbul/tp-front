@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { CatalogEntry, CatalogFormData } from '../../lib/supabase';
+import { filterEntries, sortEntries, computeStats } from '../../lib/catalog-utils';
+import type { FilterType, FilterStatus, SortBy } from '../../lib/catalog-utils';
 import MovieCard from './MovieCard';
 import MovieForm from './MovieForm';
-
-type FilterType = 'all' | 'movie' | 'series';
-type FilterStatus = 'all' | 'watching' | 'completed' | 'wishlist' | 'dropped';
-type SortBy = 'newest' | 'oldest' | 'title' | 'rating';
 
 const STATUS_FILTERS: [FilterStatus, string][] = [
   ['all', 'Todos'],
@@ -100,32 +98,8 @@ export default function CatalogApp() {
     window.location.href = '/';
   };
 
-  const filtered = entries
-    .filter((e) => {
-      if (filterType !== 'all' && e.type !== filterType) return false;
-      if (filterStatus !== 'all' && e.status !== filterStatus) return false;
-      if (search && !e.title.toLowerCase().includes(search.toLowerCase())) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'oldest':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        case 'title':
-          return a.title.localeCompare(b.title, 'es');
-        case 'rating':
-          return (b.rating ?? 0) - (a.rating ?? 0);
-        default:
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      }
-    });
-
-  const stats = {
-    total: entries.length,
-    movies: entries.filter((e) => e.type === 'movie').length,
-    series: entries.filter((e) => e.type === 'series').length,
-    completed: entries.filter((e) => e.status === 'completed').length,
-  };
+  const filtered = sortEntries(filterEntries(entries, filterType, filterStatus, search), sortBy);
+  const stats = computeStats(entries);
 
   if (loading) {
     return (
